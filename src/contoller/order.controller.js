@@ -9,6 +9,8 @@ const createOrder = catchAsyncErrors(async (req, res) => {
     items, // Array of items with itemName, quantity, pricePerPiece
     advancedAmount,
     image,
+    customerPhone,
+    deliveryDate,
     status,
   } = req.body;
 
@@ -36,6 +38,8 @@ const createOrder = catchAsyncErrors(async (req, res) => {
     advancedAmount: advancedAmount || 0,
     dueAmount,
     image,
+    customerPhone,
+    deliveryDate,
     status: status || "pending",
   });
 
@@ -48,21 +52,47 @@ const createOrder = catchAsyncErrors(async (req, res) => {
 // Get User Orders
 const getUserOrders = catchAsyncErrors(async (req, res) => {
   const userId = req.user;
-//   console.log("User ID:", userId);
+  //   console.log("User ID:", userId);
   const user = await User.findById(userId);
   const userRole = user?.role;
   let orders;
-//   console.log("User Role:", userRole);
+  //   console.log("User Role:", userRole);
   if (userRole === "owner") {
-    orders = await Order.find().populate({ path: "createdBy",select: "-password" });
+    orders = await Order.find().populate({
+      path: "createdBy",
+      select: "-password",
+    });
   } else {
-    orders = await Order.find().select("items status").populate({ path: "createdBy", select: "-password" });
+    orders = await Order.find({ status: { $ne: "delivered" } })
+      .select("items status")
+      .populate({ path: "createdBy", select: "-password" });
   }
 
   res.status(200).json({ orders });
 });
 
+const changeStatus = catchAsyncErrors(async (req, res) => {
+  const status = req.body.status;
+  const id = req.params.id;
+
+  if (!["pending", "delivered", "canceled"].includes(status)) {
+    return res.status(400).json({ message: "Invalid status value" });
+  }
+
+  const order = await Order.findById(id);
+  if (!order) {
+    return res.status(400).json({ message: "No order found" });
+  }
+  order.status = status;
+  await order.save({ validateBeforeSave: false });
+
+  return res
+    .status(200)
+    .json({ message: "Order status changed successfully!" });
+});
+
 module.exports = {
   createOrder,
   getUserOrders,
+  changeStatus,
 };
