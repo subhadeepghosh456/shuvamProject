@@ -1,9 +1,9 @@
 const express = require("express");
 const cors = require("cors");
-const connectDB = require("./DB");
+const connectDB = require("../DB");  // Changed from "./DB"
 const cookieParser = require('cookie-parser');                                  
-const userRoute = require("./route/user.route");
-const orderRoute = require("./route/order.route");
+const userRoute = require("../route/user.route");  // Changed from "./route/user.route"
+const orderRoute = require("../route/order.route");  // Changed from "./route/order.route"
 
 require("dotenv").config();
 
