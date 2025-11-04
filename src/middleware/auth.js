@@ -4,20 +4,22 @@ const catchAsyncErrors = require("./../utils/asyncHandler");
 const ApiError = require("./../utils/Apierror");
 
 const userAuth = catchAsyncErrors(async (req, res, next) => {
-  const { token } = req.cookies;
+  let token;
 
-  if (!token) {
-    return res.status(401).send("Please Login!!!");
+  // Check for Bearer token in Authorization header
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
   }
 
   const decodedMessage = await jwt.verify(token, process.env.JWT_SECRET);
   const { id } = decodedMessage;
 
   const user = await User.findById(id);
-  
+
   if (!user) {
     // throw new Error("User not found");
-     throw new ApiError(400, "User not found");
+    throw new ApiError(400, "User not found");
   }
 
   req.user = user._id;
