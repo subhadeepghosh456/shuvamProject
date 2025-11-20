@@ -1,28 +1,38 @@
 const Order = require("./../model/order.model");
 const User = require("./../model/user.model");
 const catchAsyncErrors = require("../utils/asyncHandler");
+const { uploadOnCloudinary } = require("../utils/cloudinary");
 
 // Create Order
 
 const createOrder = catchAsyncErrors(async (req, res) => {
   const {
-    items, // Array of items with itemName, quantity, pricePerPiece
+    // items, // Array of items with itemName, quantity, pricePerPiece
     advancedAmount,
-    image,
+    // image,
     customerPhone,
     deliveryDate,
     status,
   } = req.body;
-
   // Calculate itemTotal for each item and dueAmount
-  const processedItems = items.map((item) => ({
+  const image = req?.files?.image?.[0]?.path;
+  // public\temp\Energy-Management.jpg
+
+  const prodImage =await uploadOnCloudinary(image)
+ 
+
+
+
+  const items = JSON.parse(req.body.items);
+
+  const processedItems = items?.map((item) => ({
     itemName: item.itemName,
     quantity: item.quantity,
     pricePerPiece: item.pricePerPiece,
     // itemTotal: item.quantity * item.pricePerPiece
   }));
 
-  const totalAmountCalculated = processedItems.reduce(
+  const totalAmountCalculated = processedItems?.reduce(
     (acc, item) => acc + item.quantity * item.pricePerPiece,
     0
   );
@@ -37,7 +47,7 @@ const createOrder = catchAsyncErrors(async (req, res) => {
     totalAmount: totalAmountCalculated,
     advancedAmount: advancedAmount || 0,
     dueAmount,
-    image,
+    image:prodImage?.secure_url || "",
     customerPhone,
     deliveryDate,
     status: status || "pending",
