@@ -70,7 +70,7 @@ const createOrder = catchAsyncErrors(async (req, res) => {
 
 // Get User Orders
 const getUserOrders = catchAsyncErrors(async (req, res) => {
-  const userId = req.user;
+  const userId = req?.user;
   //   console.log("User ID:", userId);
   const user = await User.findById(userId);
   const userRole = user?.role;

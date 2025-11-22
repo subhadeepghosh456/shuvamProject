@@ -8,11 +8,7 @@ cloudinary.config({
   api_secret: "MH6c8jX91afQypoFLP7dQ9t0Ja0", // Fixed spelling
 });
 
-console.log(
-  process.env.CLOUDINARY_CLOUD_NAME,
-  process.env.CLOUDINARY_API_KEY,
-  process.env.CLOUDINARY_API_SECRET
-);
+
 
 const uploadOnCloudinary = async (localFilePath) => {
   try {
