@@ -19,26 +19,35 @@ const createOrder = catchAsyncErrors(async (req, res) => {
   // public\temp\Energy-Management.jpg
 
   const prodImage =await uploadOnCloudinary(image)
- 
+  let items= [];
+  let processedItems= [];
+  let totalAmountCalculated= 0;
+  let dueAmount=0;
 
+  if(req.body.items){
+    
+   items = JSON.parse(req.body.items);
 
-
-  const items = JSON.parse(req.body.items);
-
-  const processedItems = items?.map((item) => ({
+   processedItems = items?.map((item) => ({
     itemName: item.itemName,
     quantity: item.quantity,
     pricePerPiece: item.pricePerPiece,
     // itemTotal: item.quantity * item.pricePerPiece
   }));
 
-  const totalAmountCalculated = processedItems?.reduce(
+   totalAmountCalculated = processedItems?.reduce(
     (acc, item) => acc + item.quantity * item.pricePerPiece,
     0
   );
 
   // Calculate dueAmount
-  const dueAmount = totalAmountCalculated - (advancedAmount || 0);
+   dueAmount = totalAmountCalculated - (advancedAmount || 0);
+
+  }
+ 
+
+
+
 
   // Create the order
   const newOrder = await Order.create({
