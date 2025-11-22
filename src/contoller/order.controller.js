@@ -83,7 +83,7 @@ const getUserOrders = catchAsyncErrors(async (req, res) => {
     });
   } else {
     orders = await Order.find({ status: { $ne: "delivered" } })
-      .select("items deliveryDate status")
+      .select("items deliveryDate status image")
       .populate({ path: "createdBy", select: "-password" });
   }
 
